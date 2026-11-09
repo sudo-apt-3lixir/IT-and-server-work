@@ -1,1 +1,599 @@
-<h1>Hello from my MacBook!</h1><p>My first network-hosted website works.</p>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Oli's IT Lab</title>
+<style>
+:root {
+  --bg:#090d16;
+  --panel:#111827;
+  --panel2:#151f30;
+  --line:#263449;
+  --text:#e8eef8;
+  --muted:#8795aa;
+  --blue:#65a8ff;
+  --green:#45d6a0;
+  --orange:#ffbd69;
+  --red:#ff737d;
+}
+* { box-sizing:border-box; }
+body {
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+}
+button { font:inherit; }
+.layout { min-height:100vh; display:flex; }
+.sidebar {
+  width:235px; flex-shrink:0; background:#0d1421;
+  border-right:1px solid var(--line); padding:25px 16px;
+  display:flex; flex-direction:column;
+}
+.brand { display:flex; align-items:center; gap:11px; padding:0 9px 28px; }
+.brand-icon {
+  width:38px;height:38px;border-radius:12px;
+  background:linear-gradient(135deg,#2777e8,#55d6bd);
+  display:grid;place-items:center;font-size:19px;font-weight:800;color:white;
+}
+.brand-name { font-weight:800;letter-spacing:1.1px;font-size:14px; }
+.brand-sub { color:var(--muted);font-size:11px;margin-top:4px; }
+.nav-label {
+  color:#63738b;font-size:10px;font-weight:800;letter-spacing:1.5px;
+  padding:13px 10px 9px;
+}
+.nav-button {
+  display:flex;align-items:center;gap:12px;width:100%;
+  border:0;background:transparent;color:#9cabc0;
+  padding:12px 13px;border-radius:9px;text-align:left;
+  cursor:pointer;margin:2px 0;font-size:13px;
+}
+.nav-button:hover { background:#172337;color:white; }
+.nav-button.active { background:#1a3150;color:#8fc0ff; }
+.nav-icon { width:19px;text-align:center;font-size:16px; }
+.sidebar-bottom { margin-top:auto;padding:15px 10px 0;border-top:1px solid var(--line); }
+.connection { display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted); }
+.dot { width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 10px #45d6a077; }
+.main { min-width:0;flex:1;padding:27px 32px 45px;max-width:1600px;margin:0 auto; }
+.topbar { display:flex;justify-content:space-between;align-items:center;gap:15px;margin-bottom:28px; }
+.eyebrow { color:var(--blue);font-size:10px;letter-spacing:2px;font-weight:800; }
+h1 { font-size:25px;margin:6px 0 0;letter-spacing:-.6px; }
+.top-right { display:flex;align-items:center;gap:15px; }
+.clock { color:var(--muted);font-size:13px;font-variant-numeric:tabular-nums; }
+.status-pill { border:1px solid #245944;background:#10281f;color:var(--green);border-radius:30px;padding:7px 11px;font-size:11px;font-weight:700; }
+.view { display:none; }
+.view.active { display:block; }
+.section-heading { display:flex;justify-content:space-between;align-items:end;margin:25px 0 13px;gap:10px; }
+.section-heading h2 { margin:0;font-size:16px; }
+.section-heading p { margin:5px 0 0;color:var(--muted);font-size:12px; }
+.grid { display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px; }
+.grid.two { grid-template-columns:repeat(2,minmax(0,1fr)); }
+.grid.three { grid-template-columns:repeat(3,minmax(0,1fr)); }
+.card {
+  background:var(--panel);border:1px solid var(--line);
+  border-radius:13px;padding:17px;min-width:0;
+}
+.metric-top { display:flex;justify-content:space-between;align-items:center; }
+.metric-label { color:var(--muted);font-size:11px;font-weight:700;letter-spacing:.8px; }
+.metric-icon { width:31px;height:31px;border-radius:9px;background:#1b2b42;display:grid;place-items:center; }
+.metric-value { font-size:29px;font-weight:750;letter-spacing:-1px;margin:14px 0 5px;font-variant-numeric:tabular-nums; }
+.metric-sub { color:var(--muted);font-size:11px; }
+.progress { height:6px;background:#253247;border-radius:8px;margin-top:14px;overflow:hidden; }
+.progress span { display:block;height:100%;width:0;background:var(--blue);border-radius:8px;transition:width .5s; }
+.progress.green span { background:var(--green); }
+.progress.orange span { background:var(--orange); }
+.panel-title { font-size:13px;font-weight:700;margin:0 0 16px; }
+.chart-card { min-height:250px; }
+canvas { width:100%;height:175px;display:block; }
+.chart-legend { display:flex;gap:16px;color:var(--muted);font-size:11px;margin-top:8px; }
+.legend-dot { display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:5px; }
+.info-list { display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 20px; }
+.info-row { display:flex;justify-content:space-between;gap:12px;padding:13px 0;border-bottom:1px solid #202d40;font-size:12px; }
+.info-row span:first-child { color:var(--muted); }
+.info-row strong { text-align:right;overflow-wrap:anywhere;font-weight:600; }
+.table-wrap { overflow-x:auto; }
+table { border-collapse:collapse;width:100%;font-size:12px; }
+th { text-align:left;color:var(--muted);font-size:10px;letter-spacing:.7px;font-weight:700;padding:11px 10px;border-bottom:1px solid var(--line); }
+td { padding:12px 10px;border-bottom:1px solid #202d40; }
+tbody tr:hover { background:#172235; }
+td.name { max-width:290px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap; }
+.mono { font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums; }
+.tag { display:inline-block;border-radius:6px;padding:4px 7px;background:#1b2d44;color:#9bc5ff;font-size:10px; }
+.muted { color:var(--muted); }
+.big-number { font-size:25px;font-weight:750;margin:7px 0; }
+.network-number { font-size:23px;font-weight:700;margin:8px 0; }
+.storage-ring {
+  width:145px;height:145px;border-radius:50%;margin:15px auto;
+  display:grid;place-items:center;
+  background:conic-gradient(var(--blue) 0deg,#263449 0deg);
+}
+.storage-inner { width:112px;height:112px;border-radius:50%;background:var(--panel);display:grid;place-items:center;text-align:center; }
+.storage-inner strong { font-size:23px; }
+.storage-inner span { font-size:10px;color:var(--muted); }
+.notice { color:var(--muted);font-size:11px;line-height:1.6;margin-top:13px; }
+.refresh { border:1px solid var(--line);background:#172337;color:#c8d7eb;padding:8px 12px;border-radius:8px;cursor:pointer;font-size:11px; }
+.refresh:hover { border-color:var(--blue); }
+.footer { color:#65758c;font-size:10px;text-align:center;padding:28px 0 0; }
+@media(max-width:1050px) {
+  .grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+  .main { padding:24px 20px; }
+}
+@media(max-width:700px) {
+  .layout { display:block; }
+  .sidebar { width:100%;padding:12px;display:block;border-right:0;border-bottom:1px solid var(--line); }
+  .brand { padding:3px 8px 12px; }
+  .nav-label,.sidebar-bottom { display:none; }
+  .nav-list { display:flex;overflow-x:auto;gap:4px; }
+  .nav-button { width:auto;white-space:nowrap;padding:9px 11px; }
+  .main { padding:20px 13px; }
+  .grid,.grid.two,.grid.three { grid-template-columns:1fr; }
+  .info-list { grid-template-columns:1fr; }
+  .topbar { align-items:flex-start; }
+  h1 { font-size:21px; }
+}
+</style>
+</head>
+<body>
+<div class="layout">
+<aside class="sidebar">
+  <div class="brand">
+    <div class="brand-icon">O</div>
+    <div><div class="brand-name">OLI'S IT LAB</div><div class="brand-sub">PERSONAL SYSTEM MONITOR</div></div>
+  </div>
+  <div class="nav-label">MONITORING</div>
+  <nav class="nav-list">
+    <button class="nav-button active" data-view="overview"><span class="nav-icon">▦</span>Overview</button>
+    <button class="nav-button" data-view="performance"><span class="nav-icon">⌁</span>Performance</button>
+    <button class="nav-button" data-view="network"><span class="nav-icon">⌘</span>Networking</button>
+    <button class="nav-button" data-view="processes"><span class="nav-icon">☷</span>Processes</button>
+    <button class="nav-button" data-view="storage"><span class="nav-icon">▤</span>Storage</button>
+  </nav>
+  <div class="nav-label">SYSTEM</div>
+  <nav class="nav-list">
+    <button class="nav-button" data-view="system"><span class="nav-icon">⚙</span>System information</button>
+    <button class="nav-button" data-view="health"><span class="nav-icon">♥</span>Health & status</button>
+    <button class="nav-button" data-view="logs"><span class="nav-icon">≡</span>Dashboard logs</button>
+  </nav>
+  <div class="sidebar-bottom">
+    <div class="connection"><span class="dot" id="sideDot"></span><span id="sideStatus">Connecting...</span></div>
+    <div class="brand-sub" style="margin-top:9px">LOCALHOST · PORT 5050</div>
+  </div>
+</aside>
+
+<main class="main">
+<header class="topbar">
+  <div><div class="eyebrow">SYSTEM CONTROL CENTER</div><h1 id="pageTitle">Overview</h1></div>
+  <div class="top-right"><span class="clock" id="clock">--:--:--</span><span class="status-pill" id="topStatus">● CONNECTING</span></div>
+</header>
+
+<section class="view active" id="view-overview">
+  <div class="grid">
+    <div class="card">
+      <div class="metric-top"><span class="metric-label">CPU USAGE</span><span class="metric-icon">⌁</span></div>
+      <div class="metric-value" id="cpuValue">--%</div><div class="metric-sub">Processor utilization</div>
+      <div class="progress"><span id="cpuBar"></span></div>
+    </div>
+    <div class="card">
+      <div class="metric-top"><span class="metric-label">MEMORY USAGE</span><span class="metric-icon">▦</span></div>
+      <div class="metric-value" id="ramValue">--%</div><div class="metric-sub" id="ramSub">-- / -- GB used</div>
+      <div class="progress green"><span id="ramBar"></span></div>
+    </div>
+    <div class="card">
+      <div class="metric-top"><span class="metric-label">DISK USAGE</span><span class="metric-icon">▤</span></div>
+      <div class="metric-value" id="diskValue">--%</div><div class="metric-sub" id="diskSub">-- GB free</div>
+      <div class="progress orange"><span id="diskBar"></span></div>
+    </div>
+    <div class="card">
+      <div class="metric-top"><span class="metric-label">PROCESSES</span><span class="metric-icon">☷</span></div>
+      <div class="metric-value" id="processCount">--</div><div class="metric-sub">Running processes</div>
+      <div class="metric-sub" style="margin-top:14px" id="hostName">Loading hostname...</div>
+    </div>
+  </div>
+  <div class="section-heading"><div><h2>Performance overview</h2><p>Live readings from your MacBook</p></div><span class="tag">LIVE · 3 SEC</span></div>
+  <div class="grid two">
+    <div class="card chart-card"><h3 class="panel-title">CPU activity</h3><canvas id="cpuChart"></canvas><div class="chart-legend"><span><i class="legend-dot" style="background:#65a8ff"></i>CPU usage</span></div></div>
+    <div class="card chart-card"><h3 class="panel-title">Memory activity</h3><canvas id="ramChart"></canvas><div class="chart-legend"><span><i class="legend-dot" style="background:#45d6a0"></i>RAM usage</span></div></div>
+  </div>
+  <div class="section-heading"><div><h2>System snapshot</h2><p>Quick information about this machine</p></div></div>
+  <div class="card"><div class="info-list">
+    <div class="info-row"><span>Local IP address</span><strong class="mono" id="overviewIP">--</strong></div>
+    <div class="info-row"><span>Architecture</span><strong id="overviewArch">--</strong></div>
+    <div class="info-row"><span>Operating system</span><strong id="overviewOS">--</strong></div>
+    <div class="info-row"><span>Server status</span><strong id="overviewHealth">--</strong></div>
+  </div></div>
+</section>
+
+<section class="view" id="view-performance">
+  <div class="section-heading"><div><h2>Performance monitor</h2><p>Recent CPU and memory readings</p></div><span class="tag">AUTO REFRESH</span></div>
+  <div class="grid two">
+    <div class="card chart-card"><h3 class="panel-title">CPU utilization</h3><div class="big-number" id="cpuLarge">--%</div><canvas id="cpuChartLarge"></canvas></div>
+    <div class="card chart-card"><h3 class="panel-title">Memory utilization</h3><div class="big-number" id="ramLarge">--%</div><canvas id="ramChartLarge"></canvas></div>
+  </div>
+  <div class="section-heading"><div><h2>Resource details</h2><p>Current system resource readings</p></div></div>
+  <div class="grid three">
+    <div class="card"><div class="metric-label">MEMORY USED</div><div class="network-number" id="perfRamUsed">-- GB</div><div class="muted" id="perfRamTotal">of -- GB</div></div>
+    <div class="card"><div class="metric-label">DISK SPACE FREE</div><div class="network-number" id="perfDiskFree">-- GB</div><div class="muted">Root volume</div></div>
+    <div class="card"><div class="metric-label">PROCESS COUNT</div><div class="network-number" id="perfProcesses">--</div><div class="muted">Visible to this user</div></div>
+  </div>
+</section>
+
+<section class="view" id="view-network">
+  <div class="section-heading"><div><h2>Network monitor</h2><p>Traffic counters from available network interfaces</p></div><span class="tag">LIVE</span></div>
+  <div class="grid three">
+    <div class="card"><div class="metric-label">LOCAL IP ADDRESS</div><div class="network-number mono" id="networkIP">--</div><div class="muted">Wi-Fi interface en0</div></div>
+    <div class="card"><div class="metric-label">DOWNLOAD SPEED</div><div class="network-number" id="downloadSpeed">-- KB/s</div><div class="muted">Received traffic</div></div>
+    <div class="card"><div class="metric-label">UPLOAD SPEED</div><div class="network-number" id="uploadSpeed">-- KB/s</div><div class="muted">Sent traffic</div></div>
+  </div>
+  <div class="section-heading"><div><h2>Traffic totals</h2><p>Cumulative counters since system startup</p></div></div>
+  <div class="grid two">
+    <div class="card"><div class="metric-label">TOTAL RECEIVED</div><div class="big-number" id="receivedTotal">-- GB</div></div>
+    <div class="card"><div class="metric-label">TOTAL SENT</div><div class="big-number" id="sentTotal">-- GB</div></div>
+  </div>
+  <p class="notice">Network rates are calculated from system-wide interface counters. They may include more than just Wi-Fi traffic.</p>
+</section>
+
+<section class="view" id="view-processes">
+  <div class="section-heading"><div><h2>Running processes</h2><p>Top 15 processes by memory usage</p></div><button class="refresh" id="refreshProcesses">↻ Refresh</button></div>
+  <div class="grid three" style="margin-bottom:14px">
+    <div class="card"><div class="metric-label">TOTAL PROCESSES</div><div class="big-number" id="processTotal">--</div></div>
+    <div class="card"><div class="metric-label">DISPLAYED</div><div class="big-number">15</div></div>
+    <div class="card"><div class="metric-label">SORT ORDER</div><div class="big-number" style="font-size:19px">Memory ↓</div></div>
+  </div>
+  <div class="card table-wrap">
+    <table><thead><tr><th>PROCESS NAME</th><th>PID</th><th>MEMORY</th><th>CPU</th></tr></thead><tbody id="processTable"><tr><td colspan="4" class="muted">Loading processes...</td></tr></tbody></table>
+  </div>
+  <p class="notice">Some macOS processes may be hidden or have restricted information. CPU percentages can initially show 0 until sampled.</p>
+</section>
+
+<section class="view" id="view-storage">
+  <div class="section-heading"><div><h2>Storage monitor</h2><p>Disk usage for the root volume</p></div></div>
+  <div class="grid two">
+    <div class="card" style="text-align:center">
+      <h3 class="panel-title" style="text-align:left">Disk utilization</h3>
+      <div class="storage-ring" id="storageRing"><div class="storage-inner"><div><strong id="storagePercent">--%</strong><br><span>USED</span></div></div></div>
+      <div class="muted">Root volume /</div>
+    </div>
+    <div class="card">
+      <h3 class="panel-title">Storage details</h3>
+      <div class="info-row"><span>Used percentage</span><strong id="storageUsed">--%</strong></div>
+      <div class="info-row"><span>Free space</span><strong id="storageFree">-- GB</strong></div>
+      <div class="info-row"><span>Total volume size</span><strong id="storageTotal">-- GB</strong></div>
+      <div class="info-row"><span>Volume</span><strong>/</strong></div>
+    </div>
+  </div>
+  <p class="notice">macOS uses APFS and shared storage between volumes. These figures describe the filesystem view returned for / and may differ from the Storage display in System Settings.</p>
+</section>
+
+<section class="view" id="view-system">
+  <div class="section-heading"><div><h2>System information</h2><p>Operating system and hardware details</p></div><button class="refresh" id="refreshSystem">↻ Refresh</button></div>
+  <div class="card"><div class="info-list">
+    <div class="info-row"><span>Hostname</span><strong id="sysHostname">--</strong></div>
+    <div class="info-row"><span>Operating system</span><strong id="sysOS">--</strong></div>
+    <div class="info-row"><span>OS release</span><strong id="sysRelease">--</strong></div>
+    <div class="info-row"><span>Architecture</span><strong id="sysMachine">--</strong></div>
+    <div class="info-row"><span>Processor</span><strong id="sysProcessor">--</strong></div>
+    <div class="info-row"><span>Physical cores</span><strong id="sysCores">--</strong></div>
+    <div class="info-row"><span>Logical threads</span><strong id="sysThreads">--</strong></div>
+    <div class="info-row"><span>Python version</span><strong id="sysPython">--</strong></div>
+    <div class="info-row"><span>System boot time</span><strong id="sysBoot">--</strong></div>
+  </div></div>
+</section>
+
+<section class="view" id="view-health">
+  <div class="section-heading"><div><h2>Health & status</h2><p>Dashboard service availability</p></div><button class="refresh" id="refreshHealth">↻ Check now</button></div>
+  <div class="grid three">
+    <div class="card"><div class="metric-label">DASHBOARD API</div><div class="big-number" id="healthStatus">--</div><div class="muted">Local Flask service</div></div>
+    <div class="card"><div class="metric-label">SERVER UPTIME</div><div class="big-number" id="healthUptime">--</div><div class="muted">Since Flask started</div></div>
+    <div class="card"><div class="metric-label">LAST CHECK</div><div class="big-number" id="healthTime">--</div><div class="muted">Local system time</div></div>
+  </div>
+  <div class="section-heading"><div><h2>Service checks</h2><p>Availability of dashboard endpoints</p></div></div>
+  <div class="card" id="serviceChecks">
+    <div class="info-row"><span>Statistics API</span><strong>Waiting...</strong></div>
+    <div class="info-row"><span>Processes API</span><strong>Waiting...</strong></div>
+    <div class="info-row"><span>System API</span><strong>Waiting...</strong></div>
+    <div class="info-row"><span>Health API</span><strong>Waiting...</strong></div>
+  </div>
+  <p class="notice">This page checks the dashboard itself. It is not a full hardware diagnostic or macOS service monitor.</p>
+</section>
+
+<section class="view" id="view-logs">
+  <div class="section-heading"><div><h2>Dashboard event log</h2><p>Events generated by this dashboard session</p></div><button class="refresh" id="clearLogs">Clear log</button></div>
+  <div class="card table-wrap">
+    <table><thead><tr><th>TIME</th><th>TYPE</th><th>EVENT</th></tr></thead><tbody id="logTable"></tbody></table>
+  </div>
+  <p class="notice">These are dashboard-generated events, not protected macOS system logs.</p>
+</section>
+
+<div class="footer">OLI'S IT LAB · LOCAL SYSTEM MONITOR · AUTO REFRESH EVERY 3 SECONDS</div>
+</main>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+const cpuHistory = [];
+const ramHistory = [];
+const downloadHistory = [];
+const uploadHistory = [];
+const logs = [];
+let lastStatus = null;
+let currentStats = null;
+
+function addLog(type, message) {
+  logs.unshift({time:new Date().toLocaleTimeString(),type,message});
+  if (logs.length > 60) logs.pop();
+  renderLogs();
+}
+function renderLogs() {
+  const body = $("logTable");
+  body.replaceChildren();
+  if (!logs.length) {
+    const row=document.createElement("tr"), cell=document.createElement("td");
+    cell.colSpan=3;cell.textContent="No dashboard events yet.";cell.className="muted";
+    row.appendChild(cell);body.appendChild(row);return;
+  }
+  logs.forEach(item=>{
+    const row=document.createElement("tr");
+    [item.time,item.type,item.message].forEach(value=>{
+      const cell=document.createElement("td");cell.textContent=value;row.appendChild(cell);
+    });
+    body.appendChild(row);
+  });
+}
+function setText(id,value) { const el=$(id); if(el) el.textContent=value; }
+function setBar(id,value) { $(id).style.width=Math.max(0,Math.min(100,Number(value)||0))+"%"; }
+function drawChart(canvasId, values, stroke) {
+  const canvas=$(canvasId);
+  if(!canvas) return;
+  const rect=canvas.getBoundingClientRect();
+  const ratio=window.devicePixelRatio||1;
+  const width=Math.max(250,rect.width);
+  const height=175;
+  canvas.width=width*ratio;canvas.height=height*ratio;
+  const ctx=canvas.getContext("2d");
+  ctx.scale(ratio,ratio);
+  ctx.clearRect(0,0,width,height);
+  ctx.strokeStyle="#263449";ctx.lineWidth=1;
+  for(let i=0;i<=4;i++){
+    const y=10+(height-25)*i/4;
+    ctx.beginPath();ctx.moveTo(30,y);ctx.lineTo(width-5,y);ctx.stroke();
+    ctx.fillStyle="#718198";ctx.font="10px sans-serif";
+    ctx.fillText(String(100-i*25),3,y+3);
+  }
+  if(values.length<2) return;
+  const plotW=width-40, plotH=height-25;
+  ctx.beginPath();
+  values.forEach((v,i)=>{
+    const x=30+(i/(Math.max(values.length-1,1)))*plotW;
+    const y=10+(100-Math.max(0,Math.min(100,v)))/100*plotH;
+    if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);
+  });
+  ctx.strokeStyle=stroke;ctx.lineWidth=2.3;ctx.lineJoin="round";ctx.stroke();
+  const last=values[values.length-1];
+  const lx=30+plotW,ly=10+(100-last)/100*plotH;
+  ctx.fillStyle=stroke;ctx.beginPath();ctx.arc(lx,ly,3.5,0,Math.PI*2);ctx.fill();
+
+}
+function drawNetworkChart(canvasId, values, stroke) {
+  const canvas = $(canvasId);
+  if (!canvas) return;
+
+  const rect = canvas.getBoundingClientRect();
+  const ratio = window.devicePixelRatio || 1;
+  const width = Math.max(250, rect.width);
+  const height = 175;
+
+  canvas.width = width * ratio;
+  canvas.height = height * ratio;
+
+  const ctx = canvas.getContext("2d");
+  ctx.scale(ratio, ratio);
+  ctx.clearRect(0, 0, width, height);
+
+  const max = Math.max(10, ...values) * 1.2;
+
+  ctx.strokeStyle = "#263449";
+  ctx.fillStyle = "#718198";
+  ctx.font = "10px sans-serif";
+
+  for (let i = 0; i <= 4; i++) {
+    const y = 10 + (height - 25) * i / 4;
+    ctx.beginPath();
+    ctx.moveTo(40, y);
+    ctx.lineTo(width - 5, y);
+    ctx.stroke();
+    ctx.fillText((max * (1 - i / 4)).toFixed(1), 3, y + 3);
+  }
+
+  if (values.length < 2) return;
+
+  const plotW = width - 45;
+  const plotH = height - 25;
+
+  ctx.beginPath();
+
+  values.forEach((v, i) => {
+    const x = 40 + i / (values.length - 1) * plotW;
+    const y = 10 + (1 - v / max) * plotH;
+
+    if (i === 0) ctx.moveTo(x, y);
+    else ctx.lineTo(x, y);
+  });
+
+  ctx.strokeStyle = stroke;
+  ctx.lineWidth = 2.5;
+  ctx.stroke();
+}
+function updateCharts(){
+  drawChart("cpuChart",cpuHistory,"#65a8ff");
+  drawChart("ramChart",ramHistory,"#45d6a0");
+  drawChart("cpuChartLarge",cpuHistory,"#65a8ff");
+  drawChart("ramChartLarge",ramHistory,"#45d6a0");
+}
+async function getJSON(path) {
+  const response=await fetch(path,{cache:"no-store"});
+  if(!response.ok) throw new Error(path+" returned "+response.status);
+  return response.json();
+}
+async function updateStats() {
+  try {
+    const data=await getJSON("/api/stats");
+    currentStats=data;
+    const cpu=Number(data.cpu)||0,ram=Number(data.ram)||0,disk=Number(data.disk)||0;
+    setText("cpuValue",cpu.toFixed(1)+"%");
+    setText("ramValue",ram.toFixed(1)+"%");
+    setText("diskValue",disk.toFixed(1)+"%");
+    setText("ramSub",data.ram_used+" / "+data.ram_total+" GB used");
+    setText("diskSub",data.disk_free+" GB free");
+    setText("processCount",data.process_count);
+    setText("hostName",data.hostname);
+    setBar("cpuBar",cpu);setBar("ramBar",ram);setBar("diskBar",disk);
+    setText("cpuLarge",cpu.toFixed(1)+"%");
+    setText("ramLarge",ram.toFixed(1)+"%");
+    setText("perfRamUsed",data.ram_used+" GB");
+    setText("perfRamTotal","of "+data.ram_total+" GB");
+    setText("perfDiskFree",data.disk_free+" GB");
+    setText("perfProcesses",data.process_count);
+    setText("overviewIP",data.ip);
+    setText("networkIP",data.ip);
+    setText("downloadSpeed",data.download+" KB/s");
+    setText("uploadSpeed",data.upload+" KB/s");
+    setText("receivedTotal",data.network_received+" GB");
+    setText("sentTotal",data.network_sent+" GB");
+    setText("storagePercent",disk.toFixed(1)+"%");
+    setText("storageUsed",disk.toFixed(1)+"%");
+    setText("storageFree",data.disk_free+" GB");
+    const total=Number(data.disk_free)/(1-disk/100);
+    setText("storageTotal",Number.isFinite(total)?total.toFixed(1)+" GB":"--");
+    $("storageRing").style.background=`conic-gradient(var(--blue) ${disk*3.6}deg,#263449 0deg)`;
+    cpuHistory.push(cpu);ramHistory.push(ram);
+    if(cpuHistory.length>40)cpuHistory.shift();
+    if(ramHistory.length>40)ramHistory.shift();
+    updateCharts();
+    if(lastStatus!==true){addLog("INFO","Statistics API connected.");lastStatus=true;}
+    setConnection(true);
+  } catch(error) {
+    setConnection(false);
+    if(lastStatus!==false)addLog("ERROR","Could not reach statistics API.");
+    lastStatus=false;
+  }
+}
+function setConnection(ok) {
+  $("sideDot").style.background=ok?"var(--green)":"var(--red)";
+  setText("sideStatus",ok?"All systems connected":"Connection problem");
+  setText("topStatus",ok?"● ONLINE":"● OFFLINE");
+  $("topStatus").style.color=ok?"var(--green)":"var(--red)";
+  $("topStatus").style.borderColor=ok?"#245944":"#63333b";
+  setText("overviewHealth",ok?"Online":"Offline");
+}
+async function updateProcesses() {
+  try {
+    const [items,stats]=await Promise.all([getJSON("/api/processes"),getJSON("/api/stats")]);
+    setText("processTotal",stats.process_count);
+    const body=$("processTable");body.replaceChildren();
+    items.forEach(p=>{
+      const row=document.createElement("tr");
+      const values=[
+        p.name||"Unknown",
+        p.pid,
+        (Number(p.memory_percent)||0).toFixed(2)+"%",
+        (Number(p.cpu_percent)||0).toFixed(1)+"%"
+      ];
+      values.forEach((value,index)=>{
+        const cell=document.createElement("td");
+        cell.textContent=value;
+        if(index===0)cell.className="name";
+        if(index===1)cell.className="mono";
+        row.appendChild(cell);
+      });
+      body.appendChild(row);
+    });
+  } catch(error) {
+    $("processTable").textContent="Unable to load processes.";
+    addLog("ERROR","Process list could not be loaded.");
+  }
+}
+async function updateSystem() {
+  try {
+    const data=await getJSON("/api/system");
+    setText("overviewArch",data.machine);
+    setText("overviewOS",data.system+" "+data.release);
+    setText("sysHostname",data.hostname);
+    setText("sysOS",data.system);
+    setText("sysRelease",data.release);
+    setText("sysMachine",data.machine);
+    setText("sysProcessor",data.processor||"Not reported");
+    setText("sysCores",data.cores);
+    setText("sysThreads",data.threads);
+    setText("sysPython",data.python);
+    setText("sysBoot",data.boot_time);
+  } catch(error) { addLog("ERROR","System information could not be loaded."); }
+}
+async function updateHealth() {
+  const endpoints=["/api/stats","/api/processes","/api/system","/api/health"];
+  const names=["Statistics API","Processes API","System API","Health API"];
+  const results=await Promise.all(endpoints.map(async path=>{
+    try { await getJSON(path);return true; } catch(e) { return false; }
+  }));
+  const body=$("serviceChecks");body.replaceChildren();
+  names.forEach((name,index)=>{
+    const row=document.createElement("div");row.className="info-row";
+    const left=document.createElement("span");left.textContent=name;
+    const right=document.createElement("strong");right.textContent=results[index]?"ONLINE":"UNAVAILABLE";
+    right.style.color=results[index]?"var(--green)":"var(--red)";
+    row.append(left,right);body.appendChild(row);
+  });
+  try {
+    const data=await getJSON("/api/health");
+    setText("healthStatus",String(data.status).toUpperCase());
+    setText("healthUptime",formatDuration(data.uptime));
+    setText("healthTime",data.time);
+  } catch(error) {
+    setText("healthStatus","OFFLINE");
+    setText("healthUptime","--");
+    setText("healthTime","--");
+  }
+}
+function formatDuration(seconds) {
+  seconds=Math.max(0,Number(seconds)||0);
+  const days=Math.floor(seconds/86400);
+  const hours=Math.floor(seconds%86400/3600);
+  const minutes=Math.floor(seconds%3600/60);
+  const secs=Math.floor(seconds%60);
+  return `${days}d ${hours}h ${minutes}m ${secs}s`;
+}
+const titles={
+  overview:"Overview",performance:"Performance",network:"Networking",
+  processes:"Processes",storage:"Storage",system:"System information",
+  health:"Health & status",logs:"Dashboard logs"
+};
+document.querySelectorAll(".nav-button").forEach(button=>{
+  button.addEventListener("click",()=>{
+    document.querySelectorAll(".nav-button").forEach(b=>b.classList.remove("active"));
+    document.querySelectorAll(".view").forEach(v=>v.classList.remove("active"));
+    button.classList.add("active");
+    $("view-"+button.dataset.view).classList.add("active");
+    setText("pageTitle",titles[button.dataset.view]);
+    if(button.dataset.view==="processes")updateProcesses();
+    if(button.dataset.view==="system")updateSystem();
+    if(button.dataset.view==="health")updateHealth();
+    if(button.dataset.view==="performance")updateCharts();
+  });
+});
+$("refreshProcesses").addEventListener("click",updateProcesses);
+$("refreshSystem").addEventListener("click",updateSystem);
+$("refreshHealth").addEventListener("click",updateHealth);
+$("clearLogs").addEventListener("click",()=>{logs.length=0;renderLogs();});
+function updateClock(){setText("clock",new Date().toLocaleTimeString());}
+updateClock();setInterval(updateClock,1000);
+addLog("INFO","Dashboard interface initialized.");
+addLog("INFO","Connecting to local Flask backend.");
+updateStats();updateSystem();updateProcesses();updateHealth();
+setInterval(updateStats,3000);
+setInterval(updateProcesses,15000);
+setInterval(updateSystem,60000);
+setInterval(updateHealth,15000);
+window.addEventListener("resize",updateCharts);
+</script>
+</body>
+</html>
